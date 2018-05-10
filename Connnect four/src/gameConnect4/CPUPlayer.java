@@ -1,22 +1,70 @@
 package gameConnect4;
 
-public class CPUPlayer{
+import java.util.ArrayList;
+
+public class BoardPosition {
 	
-	private int board[][];//this board is linked to the game on so don't change it. if you do it will affect the game 7x6 
-	private int[] column;
-	private Connect4 game;
 	
-	public CPUPlayer(Connect4 game)
-	{
-		this.game = game;
-		this.board = this.game.getBoard();
-		column =  game.getColumn();
+	
+	public BoardPosition() {
+		
 	}
 	
-	//the logic for the CPU player is written below
-	//return the column it should place piece 0 - 6
-	 public int makeMove()
-	 {
-		 return 0;
-	 }
+	//returns and boolean array with the possible moves moves as true and the others false
+	//returns empty array if the game is over
+	public boolean[] possibleMoves() {
+		
+		boolean[] temp = new boolean[7];
+		return null;
+	}
+	
+	//checks a single move for a four in a row
+	//returns max int if cpu wins, min int if cpu loses, 0 if nothing
+	public int checkMove(int slot) {
+		
+		if (checkMoveForWin(slot))
+			return Integer.MAX_VALUE;
+		if (checkMoveForLose(slot))
+			return Integer.MIN_VALUE;
+		return 0;
+	}
+	
+	//return true if cpu wins from move slot, false otherwise
+	private boolean checkMoveForWin(int slot) {
+		
+		return false;
+	}
+	
+	//return true if cpu wins from move slot, false otherwise
+	private boolean checkMoveForLose(int slot) {
+		
+		return false;
+	}
+	
+	//checks the whole board for four in a row
+	//returns true if the game comes to an end, false if not
+	public boolean checkFourInARow() {
+		
+		return false;
+	}
+	
+	//returns the new board position after a move has been made
+	public BoardPosition makeMove(int slot) {
+		
+		return null;
+	}
+	
+	//finds the winning positions for cpu
+	public boolean[][] findWinningPositions() {
+		
+		boolean[][] temp = new boolean[6][7];
+		return temp;
+	}
+	
+	//find the losing positions for cpu
+	public boolean[][] findLosingPositions() {
+		
+		boolean[][] temp = new boolean[6][7];
+		return temp;
+	}
 }
