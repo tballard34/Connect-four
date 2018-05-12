@@ -91,8 +91,8 @@ public class CPUPlayer{
 	//CPU loses returns min int possible
 	public int scoreBoard(BoardPosition board) {
 
-		boolean[][] winningPositions = board.findWinningPositions();
-		boolean[][] losingPositions = board.findLosingPositions();
+		boolean[][] winningPositions = board.findWinningPositions();//makes these 1d arrays of ints for the best positions
+		boolean[][] losingPositions = board.findLosingPositions();//same to this
 
 		//step 1: check for double ups (two kinds)
 		//double ups on top of each other
