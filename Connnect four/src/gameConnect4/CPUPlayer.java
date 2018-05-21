@@ -227,14 +227,14 @@ public class CPUPlayer{
 		count = 0;
 		for(int i = 1; i < 4; i++)//checks diagonal bottom right to top left
 		{
-			if(indexMove - 8*i > 0 && str.charAt(indexMove - 8*i) == player) {
+			if(indexMove - 8*i > 0 && indexMove - 8*i >= (slot - i) * 7 && str.charAt(indexMove - 8*i) == player) {
 				count++;
 			}else
 				break;
 		}
 		for(int i = 1; i < 4; i++)//checks diagonal top left to bottom right
 		{
-			if(indexMove + 8*i < str.length() && str.charAt(indexMove + 8*i) == player) {
+			if(indexMove + 8*i < str.length() && indexMove + 8*i < (slot + i + 1) * 7&& str.charAt(indexMove + 8*i) == player) {
 				count++;
 			}else
 				break;
