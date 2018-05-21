@@ -2,6 +2,11 @@ package gameState;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 
 import gameAssets.GameButton;
 import gameAssets.gameAction;
@@ -17,6 +22,7 @@ public class GameBoard1 extends State{
 	private CPUPlayer cpu;
 	private long lastTime = 0;
 	private String winner;
+	private BufferedImage img;
 	
 	public GameBoard1(int dif)
 	{
@@ -27,26 +33,35 @@ public class GameBoard1 extends State{
 		
 		game = new Connect4();
 		cpu = new CPUPlayer(game, dif);
+		try{
+			img = ImageIO.read((new File("Connect4.png")));//reads the png file and makes it to an image
+		}catch(IOException e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	public void render(Graphics g) {
-		g.setColor(new Color(0,0,255));
-		g.fillRect(0,0,600,450);
 		
-		for(int i = 0; i < buttons.length;i++)
-			buttons[i].render(g);
-		
-		Color[][] map = game.getColor();
+		Color[][] map = game.getColor();//gets the color map from the connect4 game object
 		for(int r = 0; r < map.length; r++)
 		{
 			for(int c = 0; c < map[r].length; c++)
 			{
 				g.setColor(map[r][c]);
-				g.fillOval(r * 85 + 5, c * 66 + 26, 50, 50);
+				g.fillOval(r * 84 + 19, c * 62 + 43, 50, 50);
 			}
-		}		
+		}
 		
-		undo.render(g);
+		g.drawImage(img, 0, 0, null);//draws the board image to the screen after the buttons to 
+		
+		g.setColor(Color.GRAY);//draws the gray bar at the bottom
+		g.fillRect(0, 410, 600, 40);
+		
+		for(int i = 0; i < buttons.length;i++)//draws the buttons at the top of the screen
+			buttons[i].render(g);		
+		
+		undo.render(g);//draws the undo button
 		
 		if(game.getGameOver())
 		{
@@ -67,7 +82,7 @@ public class GameBoard1 extends State{
 		
 		undo.tick(MouseInput.getX(), MouseInput.getY());
 		
-		if(game.getCurrent() && !game.getGameOver())//getCurrent is false when it's the seconds player's trun
+		if(game.getCurrent() && !game.getGameOver())//getCurrent is false when it's the seconds player's turn
 		{
 			int col = cpu.makeMove();
 		
