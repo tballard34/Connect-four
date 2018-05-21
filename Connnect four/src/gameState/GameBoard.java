@@ -2,66 +2,74 @@ package gameState;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 
 import gameAssets.GameButton;
 import gameAssets.gameAction;
 import gameConnect4.Connect4;
 import gameInput.MouseInput;
-
+/*
+ * this is the PvP state 
+ */
 public class GameBoard extends State{
 	
-	private GameButton[] buttons = new GameButton[7];
+	private GameButton[] buttons = new GameButton[7];//the buttons to control the drop of the pieces
 	private GameButton undo;
-	private Connect4 game;
-	private String winner;
-	private long lastTime = 0;
+	private Connect4 game;//the logic of the game is this
+	private String winner;//holds the winner at the end
+	private long lastTime = 0;//used to time the display of game over at the end of the game
+	private BufferedImage img;
+	private Color buttonBaseColor = new Color(150,150,255);
+	private Color buttonHoverColor = new Color(100,100, 200);
 	
 	public GameBoard()
 	{
-		for(int i = 0; i < buttons.length; i++)
-			buttons[i] = new GameButton(i * 85 + 2, 0, 85,25,new Color(150,150,255), new Color(100,100, 200), "" + (i + 1), new Handeler(i), false);
+		for(int i = 0; i < buttons.length; i++)//makes all the buttons to control the drops of pieces
+			buttons[i] = new GameButton(i * 85 + 2, 0, 85,25,buttonBaseColor, buttonHoverColor, "" + (i + 1), new Handeler(i), false);
+		//makes the undo button
+		undo = new GameButton(250, 410, 100, 40, buttonBaseColor, buttonHoverColor, "Undo", new Undo(), false);
 		
-		undo = new GameButton(250, 410, 100, 40, new Color(150,150,255), new Color(100,100, 200), "Undo", new Undo(), false);
+		try{
+			img = ImageIO.read((new File("Connect4.png")));//reads the png file and makes it to an image
+		}catch(IOException e)
+		{
+			e.printStackTrace();
+		}
 		
-		game = new Connect4();
+		game = new Connect4();//makes the game object
 	}
 	
 	public void render(Graphics g) {
-		//sets a blue background
-		g.setColor(new Color(0,0,255));
-		g.fillRect(0,0,600,450);
-		
-		//draws the buttons
-		for(int i = 0; i < buttons.length;i++)
-			buttons[i].render(g);
-		
-		//draws the slots on the board
-		Color[][] map = game.getColor();
+		Color[][] map = game.getColor();//gets the color map from the connect4 game object
 		for(int r = 0; r < map.length; r++)
 		{
 			for(int c = 0; c < map[r].length; c++)
 			{
 				g.setColor(map[r][c]);
-				g.fillOval(r * 85 + 5, c * 66 + 26, 50, 50);
+				g.fillOval(r * 84 + 19, c * 62 + 43, 50, 50);
 			}
-		}	
+		}
 		
-		//draws the bottom bar
-		g.setColor(Color.GRAY);
+		g.drawImage(img, 0, 0, null);//draws the board image to the screen after the buttons to 
+		
+		g.setColor(Color.GRAY);//draws the gray bar at the bottom
 		g.fillRect(0, 410, 600, 40);
 		
-		//draws the current player state
-		g.setColor(Color.BLACK);
-		if(game.getCurrent())
-			g.drawString("Current: Red", 50, 435);
+		for(int i = 0; i < buttons.length;i++)//draws the buttons at the top of the screen
+			buttons[i].render(g);		
+		
+		undo.render(g);//draws the undo button
+		
+		if(game.getCurrent())//Write to the canvas who is playing at the moment
+			g.drawString("Current Turn: Red", 25, 435);
 		else
-			g.drawString("Current: Black", 50, 435);
+			g.drawString("Current Turn: Black", 25, 435);
 		
-		//draw the undo button
-		undo.render(g);
-		
-		// draws the game over box
-		if(game.getGameOver())
+		if(game.getGameOver())//draws the box in the canvas when the game is over
 		{
 			g.setColor(new Color(50,50,50));
 			g.fillRect(245, 170, 110, 60);
@@ -72,16 +80,16 @@ public class GameBoard extends State{
 			g.setColor(Color.BLACK);
 			g.drawString("Game Over!!!", 270, 200);
 		}
-		
 	}
-
+	
+	//updates the buttons and checks if the game is over and therer is a winner
 	public void tick() {
 		for(int i = 0; i < buttons.length;i++)
 			buttons[i].tick(MouseInput.getX(), MouseInput.getY());
 		
 		undo.tick(MouseInput.getX(), MouseInput.getY());
 		
-		if(game.getGameOver() && lastTime == 0)
+		if(game.getGameOver() && lastTime == 0)//checks if lastTime is 0 so it only goes through the if statement once
 		{
 			if(game.getWinner() == 1)
 				winner = "Player 1";
@@ -90,11 +98,12 @@ public class GameBoard extends State{
 			else
 				winner = "Tie, on one ";
 			
-			lastTime = System.currentTimeMillis();
-		}else if(game.getGameOver() && System.currentTimeMillis() - lastTime > 3000)
+			lastTime = System.currentTimeMillis();//gets the time of the game ending
+		}else if(game.getGameOver() && System.currentTimeMillis() - lastTime > 3000)//if 3 seconds has passed then its game over
 			State.setState(new GameWin(winner));
 	}
 	
+	//controls the button for drops
 	private class Handeler implements gameAction
 	{
 		private int col;
@@ -104,6 +113,7 @@ public class GameBoard extends State{
 			this.col = col;
 		}
 		
+		//if the game isn't over then it makes the move
 		public void action() {
 			if(!game.getGameOver())
 			{
@@ -113,6 +123,7 @@ public class GameBoard extends State{
 		}
 	}
 	
+	//undoes the last move using the method from the Connect4 class
 	private class Undo implements gameAction
 	{
 
