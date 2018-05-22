@@ -52,7 +52,7 @@ public class CPUPlayer{
 					//bestVal = WINNING_MOVE;
 				}
 			}else if(maxDepth == 1)
-				moves[slot] = scoreBoard((red|lMove), black);
+				moves[slot] = scoreBoard((red|lMove), black, column);
 			else{
 				moves[slot] = minimax((red|lMove), black,column[0],column[1],column[2],column[3],column[4],column[5],column[6] , maxDepth - 1, false, alpha, beta);
 			}
@@ -68,11 +68,12 @@ public class CPUPlayer{
 //****************************************minimax method*************************************************
 	public int minimax(long red, long black,int c, int c1, int c2,int c3, int c4, int c5, int c6, int currentDepth, boolean isCPU, int alpha, int beta)
 	{
-		if (currentDepth == 1) {
-			return scoreBoard(red, black);
-		}
 		
 		int[] moves = {c, c1, c2, c3, c4, c5 ,c6 };
+		
+		if (currentDepth == 1) {
+			return scoreBoard(red, black, moves);
+		}
 		
 		if (isCPU) {
 			int bestVal = Integer.MIN_VALUE;
@@ -275,13 +276,7 @@ public class CPUPlayer{
 
 		//create a 2d array with a 1 in positions that player 1 wins, 2 where player 2 wins, and 3 both players win
 		//doesn't count vertical 4 in a rows
-		int[][] winningPositions = new int[6][7];
-		for (int r = 0; r < 7; r++) {
-			for (int c = 0; c < 6; c--) {
-				
-				winningPositions[r][c] = 0; 
-			}
-		}
+		int[][] winningPositions = findWinningSlots(red, black);
 		
 		//step 1: check for double ups (two kinds)
 		//double ups on top of each other
@@ -310,7 +305,7 @@ public class CPUPlayer{
 		int numEvenThreatsPlayer = 0;
 		for (int r = 0; r < 7; r++) {
 			if (columnsAvailable[r] == -1) continue; //no slot
-			for (int c = columnsAvailable[r] + 1; c < 7; c++) { //starts on not directly playable slots
+			for (int c = columnsAvailable[r] + 1; c < 6; c++) { //starts on not directly playable slots
 				
 				if (r % 2 == 1) { //even row
 					if (winningPositions[r][c] == 1 || winningPositions[r][c] == 3) { //even threat
@@ -344,7 +339,8 @@ public class CPUPlayer{
 		
 		//step 3: check middle column
 		for (int c = 0; c < 6; c++) {
-			if ()
+			//if their is a piece of cpu
+
 		}
 		
 		return score;
@@ -380,6 +376,10 @@ public class CPUPlayer{
 				s1 += "0";
 		}
 		return s1;
+	}
+	
+	private int[][] findWinningSlots(long red, long black) {
+		return null;
 	}
 
 }
