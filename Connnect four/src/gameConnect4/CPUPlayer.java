@@ -271,19 +271,83 @@ public class CPUPlayer{
 		return false;
 	}
 	
-	public int scoreBoard(long red, long black) {
+	public int scoreBoard(long red, long black, int[] columnsAvailable) {
 
+		//create a 2d array with a 1 in positions that player 1 wins, 2 where player 2 wins, and 3 both players win
+		//doesn't count vertical 4 in a rows
+		int[][] winningPositions = new int[6][7];
+		for (int r = 0; r < 7; r++) {
+			for (int c = 0; c < 6; c--) {
+				
+				winningPositions[r][c] = 0; 
+			}
+		}
+		
 		//step 1: check for double ups (two kinds)
 		//double ups on top of each other
-
-		///double ups not on top of each other but at different slots but both bottom layer
-
+		for (int r = 0; r < 7; r++) {
+			if (columnsAvailable[r] == -1) continue; //no slot
+			for (int c = columnsAvailable[r]; c < columnsAvailable[r] + 3 && c < 7; c++) {
+				int wPVal = winningPositions[r][c];
+				if (wPVal != 0 || wPVal != 3) { //if there is a clear winner at the spot
+					if (wPVal == 1 && (winningPositions[r][c + 1] == 1 || winningPositions[r][c + 1] == 3)) { //if their is a double up in favor of cpu
+						return WINNING_MOVE;
+					}
+					else if (wPVal == 2 && (winningPositions[r][c + 1] == 2 || winningPositions[r][c + 1] == 3)) {
+						return LOSING_MOVE;
+					}
+				}
+				
+			}
+		}
+		
+		int score = 0;//score of the current board
+		
 		//step 2: check for even/odd threats
 		//find number of odd threats(for cpu) that has no even threats(for player) below
-
-		//find number of even threats(for player) with no odd threats(for cpu) below
-
-		return (int)(Math.random() * 10000 + 1);
+		int numOddThreatsCPU = 0;
+		int numOddThreatsPlayer = 0;
+		int numEvenThreatsPlayer = 0;
+		for (int r = 0; r < 7; r++) {
+			if (columnsAvailable[r] == -1) continue; //no slot
+			for (int c = columnsAvailable[r] + 1; c < 7; c++) { //starts on not directly playable slots
+				
+				if (r % 2 == 1) { //even row
+					if (winningPositions[r][c] == 1 || winningPositions[r][c] == 3) { //even threat
+						numEvenThreatsPlayer++;
+						break;
+					}
+				}
+				else { //odd row
+					if (winningPositions[r][c] == 2 || winningPositions[r][c] == 3) { //odd threat
+						numOddThreatsCPU++;
+						break;
+					}
+					if (winningPositions[r][c] == 2) {
+						numOddThreatsPlayer++;
+					}
+				}
+			}
+		}
+		if (numOddThreatsPlayer == 1 && numOddThreatsCPU == 1) {
+			score += 100;
+		}
+		else if (numOddThreatsCPU != 0) {
+			score += 1000;
+		}
+		else if (numEvenThreatsPlayer >= 2) {
+			score -= 5000;
+		}
+		else if (numEvenThreatsPlayer == 1) {
+			score += 500;
+		}
+		
+		//step 3: check middle column
+		for (int c = 0; c < 6; c++) {
+			if ()
+		}
+		
+		return score;
 	}
 	
 	//converts the board in to a bitboard for each player by making the board in to a long value of base two
