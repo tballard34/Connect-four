@@ -151,19 +151,20 @@ public class CPUPlayer{
 	}
 	//******************************************************************************************************************************************
 	//used in the makeMove method to pick the best move
+   //by picking the integer in the array with the highest value and returning its index
 	private int maxIndex(int [] moves)
 	{
 		int max = 0;
 		for(int i = 1; i < moves.length; i++)
-			if(moves[i] > moves[i-1])
+			if(moves[i] > moves[max])
 				max = i;
 		return max;
 	}
 	//*********************************************************************************************************************************************
-	//Heuristic method
-	//ranks the current boardPosition, high int means in favor of CPU, low int means in not in favor of CPU
-	//CPU wins returns max int possible
-	//CPU loses returns min int possible
+	/*
+   *this is used to check if the move that is trying to be made is a win and if it is then it returns
+   *Integer.MAX_VALUE - 1 for the cpu and Integer.MIN_VALUE + 1 for the human.
+   */
 	
 	private int checkMove(long red, long black, int indexMove, int slot)
 	{
@@ -175,6 +176,10 @@ public class CPUPlayer{
 		return 0;
 	}
 	/**********************************************************************************************************************/
+   //Heuristic method
+	//ranks the current boardPosition, high int means in favor of CPU, low int means in not in favor of CPU
+	//CPU wins returns max int possible
+	//CPU loses returns min int possible
 	private boolean moveWon(long red, long black, int indexMove, int slot)
 	{
 		char player = '1';
@@ -214,7 +219,7 @@ public class CPUPlayer{
 		}
 		for(int i = 1; i < 4; i++)//checks diagonal top right to bottom left
 		{
-			if(indexMove + 6*i < str.length() && indexMove + 6 * i < (slot + i + 1) && str.charAt(indexMove + 6*i) == player) {
+			if(indexMove + 6*i < str.length() && indexMove + 6 * i < (slot + i + 1) * 7 && str.charAt(indexMove + 6*i) == player) {
 				count++;
 			}else
 				break;
@@ -234,7 +239,7 @@ public class CPUPlayer{
 		}
 		for(int i = 1; i < 4; i++)//checks diagonal top left to bottom right
 		{
-			if(indexMove + 8*i < str.length() && indexMove + 8*i < (slot + i + 1) * 7&& str.charAt(indexMove + 8*i) == player) {
+			if(indexMove + 8*i < str.length() && indexMove + 8*i < (slot + i + 1) * 7 && str.charAt(indexMove + 8*i) == player) {
 				count++;
 			}else
 				break;
@@ -278,7 +283,7 @@ public class CPUPlayer{
 
 		//find number of even threats(for player) with no odd threats(for cpu) below
 
-		return 0;
+		return (int)(Math.random() * 10000 + 1);
 	}
 	
 	//converts the board in to a bitboard for each player by making the board in to a long value of base two
