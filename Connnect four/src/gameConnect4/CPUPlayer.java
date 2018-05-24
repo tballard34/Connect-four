@@ -440,4 +440,9 @@ public class CPUPlayer{
 			return true;
       return false;
    }
+	
+	private boolean isPiece(long pLong)
+	{
+		return false;
+	}
 }
