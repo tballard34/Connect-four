@@ -449,4 +449,15 @@ public class CPUPlayer{
 		
 		return false;
 	}
+	
+	private void flip(int[][] arr)
+	{
+		for(int c = 0; c < arr.length; c++)
+			for(int r = 0; r < arr[c].length/2; r++)
+			{
+				int temp = arr[c][r];
+				arr[c][r] = arr[c][arr[c].length - c];
+				arr[c][arr[c].length - c] = temp;
+			}
+	}
 }
