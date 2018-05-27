@@ -441,8 +441,12 @@ public class CPUPlayer{
       return false;
    }
 	
-	private boolean isPiece(long pLong)
+	private boolean isPiece(long pLong, int r, int c)
 	{
+		int indexMove = r * 7 + c;
+		if((pLong >> indexMove) % 2 == 1)
+			return true;
+		
 		return false;
 	}
 }
