@@ -1,5 +1,6 @@
 package gameConnect4;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class CPUPlayer{
@@ -21,6 +22,7 @@ public class CPUPlayer{
 		map = createMap();
 	}
 
+	//creates a hashmap of who has control of the board in certain situations
 	private HashMap<Integer, Integer> createMap() {
 
 		int[] scoreVals = {0, 0, 1000, 0, 1000, 500, 5000, 1000, 
@@ -35,6 +37,7 @@ public class CPUPlayer{
 		return map;
 	}
 
+	//our hash function for our hashmap, uses base 4 because none of the ints can be greater than 4
 	public int hash(int numEvenThreatsPlayer, int numOddThreatsCPU, int numOddThreatsPlayer) {
 		return numEvenThreatsPlayer + 4 * numOddThreatsCPU + 16 * numOddThreatsPlayer;
 	}
@@ -49,6 +52,13 @@ public class CPUPlayer{
 		int alpha = Integer.MIN_VALUE;
 		int beta = Integer.MAX_VALUE;
 
+		/*
+		System.out.println("column: ");
+		for (int i = 0; i < column.length; i++) {
+			System.out.println(column[i] + " ");
+		}
+		*/
+		
 		for(int slot = 0; slot < 7; slot++)
 		{
 			//if you cannot drop into slot
@@ -60,10 +70,10 @@ public class CPUPlayer{
 			int indexMove = column[slot]*7 + slot;
 
 			String newMove = "000000000000000000000000000000000000000000";
-			newMove = newMove.substring(0,indexMove)+"1" + newMove.substring(indexMove + 1);
+			newMove = newMove.substring(0,indexMove)+ "1" + newMove.substring(indexMove + 1);
 			long lMove = Long.parseLong(newMove,2);
 
-			int val = checkMove((red|lMove), black, indexMove ,column[slot]);
+			int val = checkMove((red|lMove), black, indexMove, column[slot]);
 			System.out.println("check move: " + val);
 			//int bestVal = Integer.MIN_VALUE;
 
@@ -171,7 +181,7 @@ public class CPUPlayer{
 
 				moves[slot] = moves[slot] + 1;
 
-				bestVal = Integer.min(val, bestVal); //min?
+				bestVal = Integer.min(val, bestVal);
 				/*beta = Integer.min(beta, bestVal);
 				if (beta <= alpha)
 					break;*/
@@ -183,13 +193,27 @@ public class CPUPlayer{
 	//******************************************************************************************************************************************
 	//used in the makeMove method to pick the best move
 	//by picking the integer in the array with the highest value and returning its index
+	//randomizes moves with equals vals
 	private int maxIndex(int [] moves)
 	{
 		int max = 0;
-		for(int i = 1; i < moves.length; i++)
-			if(moves[i] > moves[max])
+		ArrayList<Integer> sameValMoves = new ArrayList<Integer>();
+		for(int i = 1; i < moves.length; i++) {
+			if (moves[i] ==  moves[max]) {
+				sameValMoves.add(i);
+			}
+			else if(moves[i] > moves[max]) {
 				max = i;
-		return max;
+				sameValMoves.clear();
+				sameValMoves.add(i);
+			}
+		}
+		if (sameValMoves.size() <= 1)
+			return max;
+		else {
+			int index = (int) (Math.random() * sameValMoves.size());
+			return sameValMoves.get(index);
+		}
 	}
 	//*********************************************************************************************************************************************
 	/*
@@ -224,10 +248,7 @@ public class CPUPlayer{
 			//System.out.println("black");
 			str = longToString(black);
 		}
-
 		//System.out.println(str);
-
-
 
 		if(checkDown(str, indexMove, slot))
 			return true;
@@ -241,13 +262,22 @@ public class CPUPlayer{
 		return false;
 	}
 
+	//returns a score for the given board state
 	public int scoreBoard(long red, long black, int[] columnsAvailable) {
 
 		//create a 2d array with a 1 in positions that player 1 wins, 2 where player 2 wins, and 3 both players win
 		//doesn't count vertical 4 in a rows
 		int[][] winningPositions = findWinningSlots(red, black, columnsAvailable);
+		
+		//print(winningPositions);
+		
 		flip(winningPositions);
-
+		
+		/*
+		System.out.println();
+		print(winningPositions);
+		 */
+		
 		//step 1: check for double ups
 		//double ups on top of each other
 		for (int col = 0; col < 7; col++) {
@@ -285,7 +315,8 @@ public class CPUPlayer{
 		for (int r = 0; r < 7; r++) {
 			if (columnsAvailable[r] == -1) continue; //no slot
 			foundEven = false;
-			for (int c = columnsAvailable[r] + 1; c < 6; c++) { //starts on not directly playable slots
+			//System.out.println("starting col: " + (6 - columnsAvailable[r]));
+			for (int c = 6 - columnsAvailable[r]; c < 6; c++) { //starts on not directly playable slots
 
 				if (r % 2 == 1) { //even row
 					if (!foundEven) {
@@ -297,7 +328,9 @@ public class CPUPlayer{
 				}
 				else { //odd row
 					if (winningPositions[r][c] == 1 || winningPositions[r][c] == 3) { //odd threat
-						numOddThreatsCPU++;
+						if (!foundEven) {
+							numOddThreatsCPU++;
+						}
 						break;
 					}
 					if (winningPositions[r][c] == 2) {
@@ -307,8 +340,10 @@ public class CPUPlayer{
 			}
 		}
 		int hashVal = hash(numEvenThreatsPlayer, numOddThreatsCPU, numOddThreatsPlayer);
+		//System.out.println(hashVal);
 		if (hashVal < map.size()) {
 			score = map.get(hashVal);
+			//System.out.println("score on hash: " + score);
 		}
 
 		//step 3: check middle column
@@ -341,6 +376,7 @@ public class CPUPlayer{
 		return Long.parseLong(s,2);//makes the long base two
 	}
 
+	//converts a long to a string
 	public String longToString(long l)
 	{
 		String s1 = "";
@@ -359,6 +395,8 @@ public class CPUPlayer{
 		return s1;
 	}
 
+	//method that returns a 1 when cpu wins, 2 when player wins, and 3 when either can win
+	//helps determine who had control of the board
 	private int[][] findWinningSlots(long red, long black, int [] columnsAvalable) {
 		int [][] map = new int[7][6];
 		for(int i = 0; i < 42; i++)
@@ -370,10 +408,9 @@ public class CPUPlayer{
 		map = findWinningSlotsHelper(map, longToString(black), columnsAvalable, 2);
 		return map;
 	}
-
 	private int[][] findWinningSlotsHelper(int [][] map, String playerString, int[] columnsAvalable, int player)
 	{
-		System.out.println("findWinningSlots");
+		//System.out.println("findWinningSlots");
 		for(int c = 0; c < columnsAvalable.length; c++)
 			for(int r = columnsAvalable[c]; r >= 0; r--)
 			{
@@ -395,6 +432,7 @@ public class CPUPlayer{
 		return map;
 	}
 
+	//checks for a minor diagonal four and a row
 	private boolean checkBottomLeftToTopRight(String str, int indexMove, int slot)
 	{
 		char player = '1';
@@ -419,6 +457,7 @@ public class CPUPlayer{
 		return false;
 	}
 
+	//checks for a major diagonal four and a row
 	private boolean checkTopLeftToBottomRight(String str,int indexMove,int slot)
 	{
 		char player = '1';
@@ -443,6 +482,7 @@ public class CPUPlayer{
 		return false;
 	}
 
+	//checks for a horizontal four and a row
 	private boolean checkHorizontal(String str, int indexMove, int slot)
 	{
 		char player = '1';
@@ -467,6 +507,7 @@ public class CPUPlayer{
 		return false;
 	}
 
+	//checks for a four and a row downwards
 	private boolean checkDown(String str, int indexMove, int slot)
 	{
 		char player = '1';
@@ -484,6 +525,7 @@ public class CPUPlayer{
 		return false;
 	}
 
+	//returns if their is a piece in the spot (r, c)
 	private boolean isPiece(long pLong, int c, int r)
 	{
 		int indexMove = c * 7 + r;
@@ -493,6 +535,7 @@ public class CPUPlayer{
 		return false;
 	}
 
+	//flips our 2-D array
 	private void flip(int[][] arr)
 	{
 		for(int c = 0; c < 7; c++)
@@ -503,4 +546,17 @@ public class CPUPlayer{
 				arr[c][arr[0].length - 1 - r] = temp;
 			}
 	}
+	
+	//standard print method for a 2-D array, used for debugging
+	private static void print(int[][] m) {
+		
+		for (int r = 0; r < m.length; r++) {
+			
+			for (int c = 0; c < m[0].length; c++) {
+				System.out.print(m[r][c] + " ");
+			}
+			System.out.println();
+		}
+	}
+	
 }
