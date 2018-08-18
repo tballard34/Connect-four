@@ -1,2 +1,2 @@
 # Connect-four
-making a connect four AI
+A connect four AI
