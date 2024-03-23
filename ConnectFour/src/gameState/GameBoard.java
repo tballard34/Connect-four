@@ -35,7 +35,7 @@ public class GameBoard extends State {
 		undo = new GameButton(250, 410, 100, 40, buttonBaseColor, buttonHoverColor, "Undo", new Undo(), false);
 
 		try {
-			img = ImageIO.read((new File("Connect4.png")));// reads the png file and makes it to an image
+			img = ImageIO.read((new File("ConnectFour/src/icons/Connect4.png")));// reads the png file and makes it to an image
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

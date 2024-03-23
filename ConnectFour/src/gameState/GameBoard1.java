@@ -35,7 +35,7 @@ public class GameBoard1 extends State {
 		game = new Connect4();
 		cpu = new CPUPlayer(game, dif);
 		try {
-			img = ImageIO.read((new File("Connect4.png")));// reads the png file and makes it to an image
+			img = ImageIO.read((new File("ConnectFour/src/icons/Connect4.png")));// reads the png file and makes it to an image
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
