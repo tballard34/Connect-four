@@ -1,8 +1,7 @@
 package gameAssets;
 
 public interface gameAction {
-	
-	public void action();
-	
-}
 
+	public void action();
+
+}
