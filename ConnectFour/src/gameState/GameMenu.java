@@ -22,8 +22,8 @@ public class GameMenu extends State{
 	
 	public GameMenu()
 	{
-		pvp = new GameButton(200, 125, 200, 75, new Color(250, 0,0), new Color(200, 0,0), "P vs. P", new StartAction(1), true);
-		pvc = new GameButton(200, 250, 200, 75, new Color(250, 0,0), new Color(200,0,0), "Human vs. CPU", new StartAction(2), true);
+		pvp = new GameButton(200, 125, 200, 75, new Color(250, 0,0), new Color(200, 0,0), "P v P", new StartAction(1), true);
+		pvc = new GameButton(200, 250, 200, 75, new Color(250, 0,0), new Color(200,0,0), "P v CPU", new StartAction(2), true);
 		try{
 			img = ImageIO.read((new File("connect4logo.png")));//reads the png file and makes it to an image
 		}catch(IOException e)
